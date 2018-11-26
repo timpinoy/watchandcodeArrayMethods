@@ -2,11 +2,117 @@
 <script>
 
 var find = function(arr, callback, thisArg) {
+  var arrLength = arr.length;
+  var callbackToRun = callback;
 
+  if (thisArg) {
+    callbackToRun = callback.bind(thisArg);
+  }
+
+  for (var i = 0; i < arrLength; i++) {
+    if (callbackToRun(arr[i], i, arr)) {
+      return arr[i];
+    }
+  }
+  
+  return undefined;
 };
 
 tests({
-  'A sample success.': function() {},
-  'A sample failure.': function() { fail(); }
+  'It should pass in the ith element as the first argument to the callback function.': function() {
+    find([1], function(number) {
+      eq(1, number);
+    });
+  },
+
+  'It should pass in i as the second argument to the callback function.': function() {
+    find([1], function(number, i) {
+      eq(0, i);
+    });
+  },
+
+  'It should pass in the original array as the third element to the callback function.': function() {
+    var array = [1, 2, 3];
+
+    find(array, function(number, i, originalArray) {
+      eq(array, originalArray);
+    });
+  },
+
+  'It should take an optional, configurable this argument.': function() {
+    find([1], function() {
+      eq('This will be accessible by the callback function', this.accessibleInCallback);
+    }, {accessibleInCallback: 'This will be accessible by the callback function'});
+  },
+
+  'If no matching element is found the callback should run array.length times.': function() {
+    var callbackRunCount = 0;
+    find([1, 2, 3], function() {
+      callbackRunCount++;
+    });
+    eq(callbackRunCount, 3);
+  },
+
+  'It should execute the callback for all indexes, not only those that have been assigned values.': function() {
+    var callbackRunCount = 0;
+    find([, 1, 2, , 3, undefined], function() {
+      callbackRunCount++;
+    });
+    eq(callbackRunCount, 6);
+  },
+
+  'It should run the callback no more than array.length times, even if elements are added.': function() {
+    var callbackRunCount = 0;
+    find([1, 2, 3], function(element, index, array) {
+      array.push(1);
+      callbackRunCount++;
+    });
+    eq(callbackRunCount, 3);
+  },
+
+  'It should execute the callback for deleted indexes.': function() {
+    var callbackRunCount = 0;
+    find([, 1, 2, , 3, undefined], function(element, index, array) {
+      if (index === 0) {
+        delete array[2];
+      }
+      
+      callbackRunCount++;
+    });
+    eq(callbackRunCount, 6);
+  },
+
+  'It should pass in the current value of an element to the callback.': function() {
+    find([1, 2], function(element, index, array) {
+      if (index === 0) {
+        array[1] = 4;
+      } else if (index === 1) {
+        eq(element, 4);
+      }
+    });
+  },
+
+  'If no matching element is found it should return undefined.': function() {
+    var returnedElement = 'some initial value';
+    returnedElement = find([1, 2, 3], function() {});
+    eq(returnedElement, undefined);
+  },
+
+  'If a matching element is found the matching element should be returned.': function() {
+    var returnedElement = find([1, 2, 3], function(element) {
+      return element > 1;
+    });
+    
+  },
+
+  'It should not mutate the array.': function() {
+    var originalArray = [1, 2, 3];
+    find(originalArray, function() {});
+    eq(originalArray.length, 3);
+    eq(originalArray[0], 1);
+    eq(originalArray[1], 2);
+    eq(originalArray[2], 3);
+  }
 });
+
 </script>
