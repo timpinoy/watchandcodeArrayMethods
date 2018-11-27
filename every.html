@@ -1,0 +1,106 @@
+<script src="simpletest.js"></script>
+<script>
+
+var every = function(array, callback, thisArg) {
+  var arrayLength = array.length;
+  var everyCallback = thisArg ? callback.bind(thisArg) : callback;
+  
+  for (var i = 0; i < arrayLength; i++) {
+    if (i in array) {
+      if (!everyCallback(array[i], i, array)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
+
+tests({
+  'It should return true if the callback returns a truthy value for every element in the array.': function() {
+    var result = every([1, 2, 3], function(element) {
+      return element > 0;
+    });
+    eq(result, true);
+  },
+  'It should return true for an empty array.': function() {
+    var result = every([], function() {});
+    eq(result, true);
+  },
+  'It should return false on the first element for which the callback does not return a truthy value.': function() {
+    var callbackRunCount = 0;
+    var result = every([1, -1, 2], function(element) {
+      callbackRunCount++;
+      return element > 0;
+    });
+    eq(callbackRunCount, 2);
+    eq(result, false);
+  },
+  'It should run the callback array.length times if the callback returns a truthy value for each element.': function() {
+    var callbackRunCount = 0;
+    var result = every([1, 2, 3], function(element) {
+      callbackRunCount++;
+      return element > 0;
+    });
+    eq(callbackRunCount, 3);
+  },
+  'It should run at most array.length times.': function() {
+    var callbackRunCount = 0;
+    var result = every([1, 2, 3], function(element, index, array) {
+      callbackRunCount++;
+      array.push(1);
+      return element > 0;
+    });
+    eq(callbackRunCount, 3);
+  },
+  'It should not run the callback for indexes with no assigned values.': function() {
+    var callbackRunCount = 0;
+    var result = every([, 1, , 2, 3, undefined], function(element, index, array) {
+      callbackRunCount++;
+      return element > 0;
+    });
+    //undefined counts as an element
+    eq(callbackRunCount, 4);
+  },
+  'It should not run the callback for elements that have been deleted.': function() {
+    var callbackRunCount = 0;
+    every([1, 2], function(element, index, array) {
+      if (index === 0) {
+        delete array[1];
+      }
+      callbackRunCount++;
+    });
+    eq(callbackRunCount, 1);
+  },
+  'It should pass in the current value of the element as the first argument to the callback.': function() {
+    every([1], function(element) {
+      eq(element, 1);
+    });
+  },
+  'It should pass in i as the second argument to the callback.': function() {
+    every([1], function(element, index) {
+      eq(index, 0);
+    });
+  },
+  'It should pass in the array as the third argument to the callback.': function() {
+    var originalArray = [1, 2, 3];
+    every(originalArray, function(element, index, array) {
+      eq(originalArray, array);
+    });
+  },
+  'It should take an optional configurable this object.': function() {
+    var configurableThisObject = { thisMustBeAccessibleInCallback: 'Hi' };
+    every([1], function() {
+      eq(this.thisMustBeAccessibleInCallback, 'Hi');
+    }, configurableThisObject);
+  },
+  'It should not mutate the array': function() {
+    var originalArray = [1, 2];
+    every(originalArray, function() {});
+    eq(originalArray.length, 2);
+    eq(originalArray[0], 1);
+    eq(originalArray[1], 2);
+  }
+});
+
+</script>
