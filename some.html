@@ -1,0 +1,103 @@
+<script src="simpletest.js"></script>
+<script>
+
+var some = function (array, callback, thisArg) {
+  var arrayLength = array.length;
+  var someCallback = thisArg ? callback.bind(thisArg) : callback;
+  
+  for (i = 0; i < arrayLength; i++) {
+    if (i in array) {
+      if (someCallback(array[i], i, array)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
+
+tests({
+  'It should return false for an empty array.': function() {
+    var result = some([], function() { return true; });
+    eq(result, false);
+  },
+  'It should return true if the callback return true for at least one element.': function() {
+    var result = some([1], function () { return true; });
+    eq(result, true);
+  },
+  'It should return false if the callback returns a falsey value for every element.': function() {
+    var result = some([1], function() { return false; });
+    eq(result, false);
+  },
+  'It should run array.length times when the callback returns a falsey value for each element.': function() {
+    var callbackRunCount = 0;
+    some([1, 2, 3], function() {
+      callbackRunCount++;
+    });
+    eq(callbackRunCount, 3);
+  },
+  'It should run at most array.length times.': function() {
+    var callbackRunCount = 0;
+    some([1, 2, 3], function(element, index, array) {
+      callbackRunCount++;
+      array.push(1);
+    });
+    eq(callbackRunCount, 3);
+  },
+  'It should stop running as soon as the callback returns true.': function() {
+    var callbackRunCount = 0;
+    some([1, 2, 3], function(element)  {
+      callbackRunCount ++;
+      return element > 1;
+    });
+    eq(callbackRunCount, 2);
+  },
+  'It should pass in the current value of the element as the first argument to the callback.': function() {
+    some([1], function(element) {
+      eq(element, 1);
+    });
+  },
+  'It should pass in index as the second argument to the callback.': function() {
+    some([1], function(element, index) {
+      eq(index, 0);
+    });
+  },
+  'It should pass in the array as the third array to the callback.': function() {
+    var originalArray = [1, 2, 3];
+    some(originalArray, function(element, index, array) {
+      eq(originalArray, array);
+    });
+  },
+  'It should take an optional configurable this object as third argument.': function() {
+    var configurableThisObject = { thisShouldBeAccessible: 'Hi' };
+    some([1], function() {
+      eq(this.thisShouldBeAccessible, 'Hi');
+    }, configurableThisObject);
+  },
+  'It should not run the callback for indexes which have no value.': function() {
+    var callbackRunCount = 0;
+    some([, 1, 2, , 3, undefined], function() {
+      callbackRunCount++;
+    });
+    eq(callbackRunCount, 4);
+  },
+  'It should not run the callback on elements which have been deleted.': function() {
+    var callbackRunCount = 0;
+    some([, 1, 2, , 3, undefined], function(element, index, array) {
+      if (index === 1) {
+        delete array[2];
+      }
+      callbackRunCount++;
+    });
+    eq(callbackRunCount, 3);
+  },
+  'It should not mutate the array.': function() {
+    var originalArray = [1, 2];
+    some(originalArray, function() {});
+    eq(originalArray.length, 2);
+    eq(originalArray[0], 1);
+    eq(originalArray[1], 2);
+  },
+});
+
+</script>
