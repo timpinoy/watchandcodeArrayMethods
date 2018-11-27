@@ -3,11 +3,7 @@
 
 var findIndex = function(array, callback, thisArg) {
   var arrayLength = array.length;
-  var findIndexCallback = callback;
-
-  if (thisArg) {
-    findIndexCallback = callback.bind(thisArg);
-  }
+  var findIndexCallback = thisArg ? callback.bind(thisArg) : callback;
 
   for (var i = 0; i < arrayLength; i++) {
     if (findIndexCallback(array[i], i, array)) {

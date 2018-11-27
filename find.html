@@ -3,11 +3,7 @@
 
 var find = function(arr, callback, thisArg) {
   var arrLength = arr.length;
-  var callbackToRun = callback;
-
-  if (thisArg) {
-    callbackToRun = callback.bind(thisArg);
-  }
+  var callbackToRun = thisArg ? callback.bind(thisArg) : callback;
 
   for (var i = 0; i < arrLength; i++) {
     if (callbackToRun(arr[i], i, arr)) {
