@@ -1,0 +1,135 @@
+<script src="simpletest.js"></script>
+<script>
+
+var reduceRight = function(array, callback, initialValue) {
+  // cloning array since changing the array in the callback
+  // should not change the result. E.g.
+  // var a = [1, 2, 3];
+  // a.reduceRight(function(acc, curr, ind, arr) { arr.splice(1, 0, 5); console.log(acc, curr, arr); return acc + curr; })
+  // -> 6
+  var clonedArray = array.slice(0);
+  var accumulator = initialValue;
+  var startingIndex = array.length - 1;
+
+  if (arguments.length < 3) {
+    if (Object.keys(array).length === 0) {
+      throw new TypeError('Reduce of empty array with no initial value');
+    }
+
+    if (Object.keys(array).length === 1) {
+      return array[0];
+    }
+
+    accumulator = clonedArray[startingIndex];
+    startingIndex--;
+  } else {
+    if (Object.keys(array).length === 0) {
+      return initialValue;
+    }
+  }
+
+
+  for (var i = startingIndex; i >= 0; i--) {
+    if (i in clonedArray) {
+      accumulator = callback(accumulator, clonedArray[i], i, array);;
+    }
+  }
+
+  return accumulator;
+}
+
+tests({
+  'If initialValue, it should run array.length times.': function() {
+    var callbackRunCount = 0;
+    var array = [0, 1, 2, 3, 4];
+    reduceRight(array, function() {
+      callbackRunCount++;
+    }, 0);
+    eq(callbackRunCount, array.length);
+  },
+  'If initialValue, it should pass in initalValue as first argument to the callback on the first run.': function() {
+    reduceRight([1], function(accumulator) {
+      eq(accumulator, 0);
+    }, 0);
+  },
+  'If initialValue, it should pass in the last index with a value as second argument to the callback on the first run.': function() {
+    reduceRight([1], function(accumulator, currentValue) {
+      eq(currentValue, 1);
+    }, 0);
+  },
+
+  'If no initialValue, it should run array.length - 1 times.': function() {
+    var callbackRunCount = 0;
+    var array = [0, 1, 2, 3, 4];
+    reduceRight(array, function() {
+      callbackRunCount++;
+    });
+    eq(callbackRunCount, array.length - 1);
+  },
+  'If no initialValue, it should pass in the last index with a value as first argument to the callback on the first run.': function() {
+    reduceRight([1, 2], function(accumulator) {
+      eq(accumulator, 2);
+    });
+  },
+  'If no initialValue, it should pass in the second to last index with a value as second argument to the callback on the first run.': function() {
+    reduceRight([1, 2], function(accumulator, currentValue) {
+      eq(currentValue, 1);
+    });
+  },
+
+  'It should throw a TypeError if no intialValue is provided and the array is empty.': function() {
+    var isTypeError;
+    try {
+      reduceRight([], function() {});
+    } catch (e) {
+      isTypeError = (e instanceof TypeError);
+    }
+    eq(isTypeError, true);
+  },
+  'It should return array[0] if array.length === 1 and no initialValue is provided': function() {
+    var result = reduceRight([1], function() {});
+    eq(result, 1);
+  },
+  'It should return initialValue if array.length === 0 and an initialValue is provided.': function() {
+    var result = reduceRight([], function() {}, 1);
+    eq(result, 1);
+  },
+
+  'It should pass in the current index as the third argument to the callback.': function() {
+    reduceRight([1], function(accumulator, currentValue, index) {
+      eq(index, 0);
+    }, 0);
+  },
+  'It should pass in the array as fourth argument to the callback.': function() {
+    var originalArray = [1]
+    reduceRight(originalArray, function(accumulator, currentValue, index, array) {
+      eq(array, originalArray);
+    }, 0);
+  },
+
+  'If initialValue, it should not run the callback for indexes that do not have an assigned value.': function() {
+    var callbackRunCount = 0;
+    var array = [0, 1, 2, ,3, , 4, ];
+    reduceRight(array, function() {
+      callbackRunCount++;
+    }, 0);
+    eq(callbackRunCount, 5);
+  },
+  'If no initialValue, it should not run the callback for indexes that do not have an assigned value.': function() {
+    var callbackRunCount = 0;
+    var array = [0, 1, 2, ,3, , 4, ];
+    reduceRight(array, function() {
+      callbackRunCount++;
+    });
+    eq(callbackRunCount, 4);
+  },
+
+  'It should reduce.': function() {
+    var result = reduceRight(['a', 'b', 'c'], function(accumulator, currentValue) {
+      return accumulator + currentValue;
+    });
+    eq(result, 'cba');
+  },
+});
+
+</script>
