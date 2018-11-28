@@ -1,0 +1,73 @@
+<script src="simpletest.js"></script>
+<script>
+
+var concat = function () {
+  var resultArray = [];
+  
+  for (var j = 0; j < arguments.length; j++) {
+    var arg = arguments[j];
+
+    if (Array.isArray(arg)) {
+      for (var i = 0; i < arg.length; i++) {
+        if (i in arg) {
+          resultArray.push(arg[i]);
+        } else {
+          resultArray.length++;
+        }
+      }
+    } else {
+      resultArray.push(arg);
+    }
+  }
+
+  return resultArray;
+};
+
+tests({
+  'It should return an array.': function() {
+    var result = concat(1, [2, 3]);
+    eq(Array.isArray(result), true);
+  },
+  'It should merge.': function() {
+    var result = concat([1, 2], 3, [4, 5, 6]);
+    eq(result.length, 6);
+    eq(result[0], 1);
+    eq(result[1], 2);
+    eq(result[2], 3);
+    eq(result[3], 4);
+    eq(result[4], 5);
+    eq(result[5], 6);
+  },
+  'It does not recurse into nested array arguments.': function() {
+    var result = concat(1, [[2, 3]]);
+    eq(Array.isArray(result[1]), true);
+    eq(result.length, 2);
+    eq(result[1].length, 2);
+  },
+  'It should copy by reference for non-primitive types.': function() {
+    var num1 = [[1]];
+    var num2 = [2, [3]];
+    var nums = concat(num1, num2);
+    num1[0].push(4);
+    eq(nums[0].length, 2);
+    eq(nums[0][1], 4);
+  },
+  'It should copy by value for primitive types.': function() {
+    var str1 = 'a';
+    var str2 = 'b'
+    var result = concat(str1, str2);
+    str1 = 'c';
+    eq(result[0], 'a');
+  },
+  'It should not change the original values pass in as parameters.': function() {
+    var arr = [1, 2];
+    var str = 'a';
+    var result = concat(arr, str);
+    eq(arr.length, 2);
+    eq(arr[0], 1);
+    eq(arr[1], 2);
+    eq(str, 'a');
+  }
+});
+
+</script>
