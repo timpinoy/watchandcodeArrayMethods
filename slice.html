@@ -1,0 +1,82 @@
+<script src="simpletest.js"></script>
+<script>
+
+var slice = function(array, begin, end) {
+  var returnArray = [];
+  var startIndex = begin < 0 ? array.length + begin : begin;
+  startIndex = startIndex ? startIndex : 0;
+  startIndex = startIndex < 0 ? 0 : startIndex;
+
+  var endIndex = end < 0 ? array.length + end : end;
+  endIndex = endIndex ? endIndex : array.length;
+  endIndex = endIndex > array.length ? array.length : endIndex;
+
+  for (var i = startIndex; i < endIndex; i++) {
+    returnArray.push(array[i]);
+  }
+
+  return returnArray;
+}
+
+tests({
+  'It should return an array.': function() {
+    var result = slice([1, 2, 3]);
+    eq(Array.isArray(result), true);
+  },
+  'It should return a shallow copy.': function() {
+    var original = [1];
+    var result = slice(original);
+    eq(original === result, false);
+    eq(result.length, 1);
+    eq(result[0], 1);
+  },
+  'It should take an optional begin parameter.': function() {
+    var result = slice([1, 2, 3], 1);
+    eq(result.length, 2);
+  },
+  'If begin is a negative value it should copy from array.length + start.': function() {
+    var result = slice([1, 2, 3], -1);
+    eq(result.length, 1);
+    eq(result[0], 3);
+  },
+  'It should take an optional end parameter and will copy up to, not including end.': function() {
+    var result = slice([1, 2, 3, 4], 1, 2);
+    eq(result.length, 1);
+    eq(result[0], 2);
+  },
+  'If end is a negative value it should copy until, not including array.length + end.': function() {
+    var result = slice([1, 2, 3, 4], 1, -2);
+    eq(result.length, 1);
+    eq(result[0], 2);
+  },
+  'It should extract to array.length if end is greater than array.length.': function() {
+    var result = slice([1, 2, 3, 4], 1, 10);
+    eq(result.length, 3);
+  },
+  'It should not alter the orignal array.': function() {
+    var originalArray = [1, 2];
+    var result = slice(originalArray);
+    eq(originalArray.length, 2);
+    eq(originalArray[0], 1);
+    eq(originalArray[1], 2);
+  },
+  'It should copy non-primitve types by reference.': function() {
+    var obj = {text: 'pre'};
+    var originalArray = [obj, 1];
+    var result = slice(originalArray);
+    eq(result[0].text, 'pre');
+    obj.text = 'post';
+    eq(result[0].text, 'post');
+  },
+  'It should copy primitive types by value.': function() {
+    var txt = 'pre';
+    var originalArray = [txt, 1];
+    var result = slice(originalArray);
+    eq(result[0], 'pre');
+    txt = 'post';
+    eq(result[0], 'pre');
+  }
+
+});
+
+</script>
