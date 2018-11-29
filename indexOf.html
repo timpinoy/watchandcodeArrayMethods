@@ -1,0 +1,49 @@
+<script src="simpletest.js"></script>
+<script>
+
+var indexOf = function(array, searchElement, fromIndex) {
+  var arrayLength = array.length;
+  var startingIndex = fromIndex < 0 ? arrayLength + fromIndex : fromIndex;
+  startingIndex = startingIndex ? startingIndex : 0;
+
+  if (arrayLength === 0) {
+    return -1;
+  }
+
+  for (var i = startingIndex; i < arrayLength; i++) {
+    if (array[i] === searchElement) {
+      return i;
+    }
+  }
+  
+  return -1;
+}
+
+tests({
+  'It should return -1 for an empty array.': function() {
+    var result = indexOf([], 'a');
+    eq(result, -1);
+  },
+  'It should return -1 if no matching element is found.': function() {
+    var result = indexOf(['a', 'b', 'c', 'a'], 'd');
+    eq(result, -1);
+  },
+  'It should return the index of the first matching element.': function() {
+    var result = indexOf(['a', 'b', 'c', 'a'], 'a');
+    eq(result, 0);
+  },
+  'It should take an optional fromIndex argument': function() {
+    var result = indexOf(['a', 'b', 'c', 'a'], 'a', 1);
+    eq(result, 3);
+  },
+  'It should return -1 if fromIndex is larger or equal to the length of array.': function() {
+    var result = indexOf(['a', 'b', 'c', 'a'], 'a', 10);
+    eq(result, -1);
+  },
+  'If the provided fromIndex value is a negative number, it is taken as the offset from the end of the array.': function() {
+    var result = indexOf(['a', 'b', 'c', 'a'], 'a', -2);
+    eq(result, 3);
+  }
+});
+
+</script>
