@@ -1,0 +1,45 @@
+<script src="simpletest.js"></script>
+<script>
+
+var include = function(array, searchElement, fromIndex) {
+  var startingIndex = fromIndex > 0 ? fromIndex : array.length - fromIndex;
+  startingIndex = startingIndex ? startingIndex : 0;
+  // prevent unnecessary loops
+  startingIndex = startingIndex < 0 ? 0 : startingIndex;
+
+  for (var i = startingIndex; i < array.length; i++) {
+    if (array[i] === searchElement) {
+      return true;
+    }
+  }
+  return false;
+}
+
+tests({
+  'It should return true if the array contains searchElement.': function() {
+    var result = include([1, 2, 3, 1], 2);
+    eq(result, true);
+  },
+  'It should return false if the array does not contain searchElement.': function() {
+    var result = include([1, 2, 3, 1], 4);
+    eq(result, false);
+  },
+  'It should take an optional fromIndex argument.': function() {
+    var result = include([1, 2, 3, 4, 5], 2, 2);
+    eq(result, false);
+    var result = include([1, 2, 3, 4, 5], 3, 1);
+    eq(result, true);
+  },
+  'If fromIndex is negative value it should search starting from the index of array.length - fromIndex.': function() {
+    var result = include([1, 2, 3, 4, 5], 1, -3);
+    eq(result, false);
+    var result = include([1, 2, 3, 4, 5], 1);
+    eq(result, true);
+  },
+  'It should return false if fromIndex is greater than or equal to array.length.': function() {
+    var result = include([1], 1, 2);
+    eq(result, false);
+  }
+});
+
+</script>
