@@ -1,0 +1,43 @@
+<script src="simpletest.js"></script>
+<script>
+
+var join = function(array, separator) {
+  var result = '';
+  var sep = separator === '' || separator ? separator : ',';
+
+  for (var i = 0; i < array.length; i++) {
+    var val = array[i];
+    val = val === undefined || val === null ? '' : val;
+    result += val + sep;
+  }
+  result = result.substring(0, result.length - sep.length);
+
+  return result;
+}
+
+tests({
+  'It should return a new string by concatenating all of the elements in the array, separated by commas.': function() {
+    var elements = ['Fire', 'Wind', 'Rain'];
+    var result = join(elements);
+    eq(result, 'Fire,Wind,Rain');
+  },
+  'It should take an optional separator argument which will replace the commas.': function() {
+    var elements = ['Fire', 'Wind', 'Rain'];
+    var result = join(elements, '-');
+    eq(result, 'Fire-Wind-Rain');
+    var result = join(elements, '');
+    eq(result, 'FireWindRain');
+  },
+  'It should return an empty string if array.length is 0.': function() {
+    var result = join([]);
+    eq(result, '');
+  },
+  'If an element is undefined or null it should be converted to an empty string.': function() {
+    var result = join([,,,]);
+    eq(result, ',,');
+    var result = join([1,,null,2]);
+    eq(result, '1,,,2');
+  },
+});
+
+</script>
