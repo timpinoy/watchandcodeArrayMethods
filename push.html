@@ -1,0 +1,30 @@
+<script src="simpletest.js"></script>
+<script>
+
+var push = function (array) {
+  var nextIndex = array.length;
+
+  for (var i = 1; i < arguments.length; i++) {
+    array[nextIndex] = arguments[i];
+    nextIndex++;
+  }
+
+  return array.length;
+}
+
+tests({
+  'It should add the append the arguments to the array.': function() {
+    var array = [1, 2];
+    push(array, 3, 4);
+    eq(array.length, 4);
+    eq(array[2], 3);
+    eq(array[3], 4);
+  },
+  'It should return the new length of the array.': function() {
+    var array = [1, 2];
+    var result = push(array, 3, 4);
+    eq(result, 4);
+  },
+});
+
+</script>
