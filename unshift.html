@@ -1,0 +1,40 @@
+<script src="simpletest.js"></script>
+<script>
+
+var unshift = function (array) {
+  var numberOfItemsToAdd = arguments.length - 1;
+  var arrayLength = array.length;
+
+  for (var i = arrayLength - 1; i >= 0; i--) {
+    array[i + numberOfItemsToAdd] = array[i];
+  }
+  for (var i = 1; i < arguments.length; i++) {
+    array[i - 1] = arguments[i];
+  }
+
+  return array.length;
+}
+
+tests({
+  'It should add elements to the start of the array array.': function() {
+    var array = [3];
+    var result = unshift(array, 1, 2);
+    eq(array.length, 3);
+    eq(array[0], 1);
+    eq(array[1], 2);
+    eq(array[2], 3);
+  },
+  'It should return the new length of the array.': function() {
+    var result = unshift([3], 1, 2);
+    eq(result, 3);
+  },
+  'It should change the length of the array.': function() {
+    var array = [2];
+    var originalLength = array.length;
+    var result = unshift(array, 1);
+    var newLength = array.length;
+    eq(originalLength !== newLength, true);
+  },
+});
+
+</script>
