@@ -1,0 +1,38 @@
+<script src="simpletest.js"></script>
+<script>
+
+var pop = function (array) {
+  if (array.length === 0) {
+    return undefined;
+  }
+
+  var element = array[array.length - 1];
+  array.length--;
+
+  return element;
+}
+
+tests({
+  'It should remove the last element from an array.': function() {
+    var array = [1, 2, 3];
+    var result = pop(array);
+    eq(array.length, 2);
+  },
+  'It should return the removed element.': function() {
+    var result = pop([1, 2, 3]);
+    eq(result, 3);
+  },
+  'It should change the length of the array.': function() {
+    var array = [1, 2, 3];
+    var originalLength = array.length;
+    var result = pop(array);
+    var newLength = array.length;
+    eq(originalLength !== newLength, true);
+  },
+  'It should return undefined for an empty array.': function() {
+    var result = pop([]);
+    eq(result, undefined);
+  },
+});
+
+</script>
