@@ -1,0 +1,33 @@
+<script src="simpletest.js"></script>
+<script>
+
+var reverse = function (array) {
+  var middle = Math.floor(array.length / 2);
+  for (var i = 0; i < middle; i++) {
+    var element = array[i];
+    array[i] = array[array.length - 1 - i];
+    array[array.length - 1 - i] = element;
+  }
+  return array;
+}
+
+tests({
+  'It should reverse the element of the array.': function() {
+    var array = ['one', 'two', 'three'];
+    reverse(array);
+    eq(array.length, 3);
+    eq(array[0], 'three');
+    eq(array[1], 'two');
+    eq(array[2], 'one');
+  },
+  'It should return the changed array.': function() {
+    var array = ['one', 'two', 'three'];
+    var result = reverse(array);
+    eq(result.length, 3);
+    eq(result[0], 'three');
+    eq(result[1], 'two');
+    eq(result[2], 'one');
+  }
+});
+
+</script>
