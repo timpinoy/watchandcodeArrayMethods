@@ -1,0 +1,124 @@
+<script src="simpletest.js"></script>
+<script>
+
+function splice(array, start, deleteCount) {
+  if (deleteCount < 0) {
+    deleteCount = 0;
+  }
+  
+  if (deleteCount === undefined) {
+    deleteCount = array.length - 1;
+  }
+
+  if (start < 0) {
+    start = array.length + start;
+    if (start < 0) {
+      start = 0;
+    }
+  }
+
+  // create array of elements that will be removed
+  var removed = [];
+  for (var i = 0; i < deleteCount; i++) {
+    removed.push(array[i + start]);
+  }
+
+  // remove elements
+  var lastIndex = array.length - 1;
+  for (var i = 0; i < deleteCount; i++) {
+    delete array[i + start];
+    swap(array, i + start, lastIndex);
+    lastIndex--;
+  }
+  array.length = array.length - deleteCount;
+
+  // add new elements
+  if (arguments.length > 3) {
+    var numberOfElementsToAdd = arguments.length - 3;
+    var numberOfElementsToMove = array.length - start;
+    array.length = array.length + numberOfElementsToAdd;
+    
+    // move existing elements
+    for (var i = 0; i < numberOfElementsToMove; i++) {
+      array[start + i + numberOfElementsToAdd] = array[start + i];
+    }
+
+    // add new elements
+    for (var i = 0; i < numberOfElementsToAdd; i++) {
+      array[start + i] = arguments[3 + i];
+    }
+
+  }
+
+  return removed;
+}
+
+var swap = function(array, i, j) {
+  var element = array[j];
+  array[j] = array[i];
+  array[i] = element;
+}
+
+tests({
+  'It should return an array with the removed elements.': function() {
+    var result = splice([1, 2, 3], 1);
+    eq(Array.isArray(result), true);
+    eq(result.length, 2);
+    eq(result[0], 2);
+    eq(result[1], 3);
+  },
+  'If no elements were removed it should return an empty array.': function() {
+    var result = splice([1, 2, 3], 1, 0);
+    eq(Array.isArray(result), true);
+    eq(result.length, 0);
+  },
+  'It should remove deleteCount elements from the array starting at start.': function() {
+    var array = [1, 2, 3];
+    splice(array, 1, 1);
+    eq(array.length, 2);
+    eq(array[0], 1);
+    eq(array[1], 3);
+  },
+  'If deleteCount is 0 or negative, no elements should be removed.': function() {
+    var array = [1, 2, 3];
+    splice(array, 0, 0);
+    eq(array.length, 3);
+    splice(array, 0, -1);
+    eq(array.length, 3);
+  },
+  'If deleteCount is not given or is greater than the elements left it should delete all elements starting at start.': function() {
+    var array = [1, 2, 3];
+    splice(array, 1);
+    eq(array.length, 1);
+    var array = [1, 2, 3];
+    splice(array, 1, 10);
+    eq(array.length, 1);
+  },
+  'It should take optional elements to be added to the array after start.': function() {
+    var array = [1, 4];
+    splice(array, 1, 0, 2, 3);
+    eq(array.length, 4);
+    eq(array[0], 1);
+    eq(array[1], 2);
+    eq(array[2], 3);
+    eq(array[3], 4);
+    var array = [1, 4];
+    splice(array, 1, 1, 2, 3);
+    eq(array.length, 3);
+    eq(array[0], 1);
+    eq(array[1], 2);
+    eq(array[2], 3);
+  },
+  'If start is negative it should be set to array.length + start or 0 if abs(start) > array.length.': function() {
+    var array = [1, 2];
+    splice(array, -1, 1);
+    eq(array.length, 1)
+    eq(array[0], 1);
+    var array = [1, 2];
+    splice(array, -10, 1);
+    eq(array.length, 1)
+    eq(array[0], 2);
+  }
+});
+
+</script>
